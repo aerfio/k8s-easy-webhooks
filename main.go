@@ -64,10 +64,10 @@ func main() {
 }
 
 // +kubebuilder:rbac:groups=admissionregistration.k8s.io,resources=mutatingwebhookconfigurations;validatingwebhookconfigurations,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:webhook:verbs=create;update,path=/validate.webhook.tester.kyma-project.io,mutating=false,failurePolicy=fail,groups=test.kyma-project.io,resources=testers,versions=v1alpha1,name=vtester.kb.io
-// +kubebuilder:webhook:verbs=create;update,path=/defaulting.webhook.tester.kyma-project.io,mutating=true,failurePolicy=fail,groups=test.kyma-project.io,resources=testers,versions=v1alpha1,name=vtester.kb.io
+// +kubebuilder:rbac:groups=test.kyma-project.io,resources=testers,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=test.kyma-project.io,resources=testers/status,verbs=get;update;patch
 
 func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher) *controller.Impl {
 	return defaulting.NewAdmissionController(ctx,

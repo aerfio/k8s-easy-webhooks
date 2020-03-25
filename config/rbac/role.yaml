@@ -4,7 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: manager-role
+  name: webhook-admin
 rules:
 - apiGroups:
   - ""
@@ -12,7 +12,6 @@ rules:
   - secrets
   verbs:
   - create
-  - delete
   - get
   - list
   - patch
@@ -43,3 +42,23 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - test.kyma-project.io
+  resources:
+  - testers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - test.kyma-project.io
+  resources:
+  - testers/status
+  verbs:
+  - get
+  - patch
+  - update
