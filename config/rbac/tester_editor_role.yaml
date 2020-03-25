@@ -1,0 +1,24 @@
+# permissions for end users to edit testers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tester-editor-role
+rules:
+- apiGroups:
+  - test.kyma-project.io
+  resources:
+  - testers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - test.kyma-project.io
+  resources:
+  - testers/status
+  verbs:
+  - get

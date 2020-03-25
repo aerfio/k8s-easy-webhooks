@@ -1,0 +1,7 @@
+domain: kyma-project.io
+repo: github.com/aerfio/webhook
+resources:
+- group: test
+  kind: Tester
+  version: v1alpha1
+version: "2"
