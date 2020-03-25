@@ -6,10 +6,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.6.0 // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.0 // indirect
-	github.com/go-logr/logr v0.1.0
 	github.com/markbates/inflect v1.0.4 // indirect
-	github.com/onsi/ginkgo v1.11.0
-	github.com/onsi/gomega v1.8.1
 	github.com/openzipkin/zipkin-go v0.2.2 // indirect
 	k8s.io/apimachinery v0.17.2
 	k8s.io/client-go v0.17.2

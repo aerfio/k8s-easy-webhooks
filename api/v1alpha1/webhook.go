@@ -5,16 +5,19 @@ import (
 
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/webhook/resourcesemantics"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var _ resourcesemantics.GenericCRD = (*Tester)(nil)
 
 func (tst *Tester) Validate(context.Context) *apis.FieldError {
-	logf.Log.Info("lel validates")
+	if tst.Spec.Data != nil && *tst.Spec.Data > 12 {
+		return apis.ErrGeneric("Incorrect values", ".Spec.Data")
+	}
 	return nil
 }
 
 func (tst *Tester) SetDefaults(context.Context) {
-	logf.Log.Info("lel defaults")
+	if tst.Spec.Foo == "" {
+		tst.Spec.Foo = "defaulted"
+	}
 }

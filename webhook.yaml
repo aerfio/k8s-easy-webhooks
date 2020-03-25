@@ -27,8 +27,20 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  creationTimestamp: null
   name: webhook-admin
 rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
       - ""
     resources:
@@ -65,53 +77,69 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+      - test.kyma-project.io
+    resources:
+      - testers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - test.kyma-project.io
+    resources:
+      - testers/status
+    verbs:
+      - get
+      - patch
+      - update
+
 ---
-apiVersion: admissionregistration.k8s.io/v1
+apiVersion: admissionregistration.k8s.io/v1beta1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: validation.webhook.pipeline.tekton.dev
+  name: validation.webhook.tester.kyma-project.io
 webhooks:
   - admissionReviewVersions:
       - v1beta1
     clientConfig:
       service:
-        name: tekton-pipelines-webhook
-        namespace: tekton-pipelines
+        name: webhook-svc
+        namespace: webhook
     failurePolicy: Fail
     sideEffects: None
-    name: validation.webhook.pipeline.tekton.dev
+    name: validation.webhook.tester.kyma-project.io
 ---
-apiVersion: admissionregistration.k8s.io/v1
+apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: webhook.pipeline.tekton.dev
+  name: webhook.tester.kyma-project.io
 webhooks:
   - admissionReviewVersions:
       - v1beta1
     clientConfig:
       service:
-        name: tekton-pipelines-webhook
-        namespace: tekton-pipelines
+        name: webhook-svc
+        namespace: webhook
     failurePolicy: Fail
     sideEffects: None
-    name: webhook.pipeline.tekton.dev
+    name: webhook.tester.kyma-project.io
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: webhook-certs
-  namespace: system
+  namespace: webhook
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: tekton-pipelines-webhook
-    role: webhook
-    pipeline.tekton.dev/release: v0.11.0-rc3
-    version: "v0.11.0-rc3"
-  name: tekton-pipelines-webhook
-  namespace: tekton-pipelines
+  name: webhook-svc
+  namespace: webhook
 spec:
   ports:
     - # Define metrics and profiling for them to be accessible within service meshes.
@@ -125,5 +153,53 @@ spec:
       port: 443
       targetPort: 8443
   selector:
-    app: tekton-pipelines-webhook
+    app: webhook-deployment
     role: webhook
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Note: the Deployment name must be the same as the Service name specified in
+  # config/400-webhook-service.yaml. If you change this name, you must also
+  # change the value of WEBHOOK_SERVICE_NAME below.
+  name: webhook-deployment
+  namespace: webhook
+  labels:
+    app.kubernetes.io/name: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-deployment
+      role: webhook
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      labels:
+        app: webhook-deployment
+        role: webhook
+    spec:
+      serviceAccountName: webhook-sa
+      containers:
+        - name: webhook
+          image: webhook-image:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: WEBHOOK_SERVICE_NAME
+              value: webhook-svc
+            - name: METRICS_DOMAIN
+              value: webhook.dev/tester
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - name: metrics
+              containerPort: 9090
+            - name: profiling
+              containerPort: 8008
+            - name: https-webhook
+              containerPort: 8443

@@ -1,7 +1,7 @@
 apiVersion: test.kyma-project.io/v1alpha1
 kind: Tester
 metadata:
-  name: tester-sample
+  name: tester-sample-incorrect
 spec:
   # Add fields here
-  data: 12
+  data: 24
