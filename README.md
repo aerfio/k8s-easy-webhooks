@@ -7,17 +7,17 @@
 Install:
 
 ```bash
-kubectl apply -f
+kubectl apply -f https://raw.githubusercontent.com/aerfio/k8s-easy-webhooks/master/webhook.yaml
 ```
 
 Wait a bit for it to start, look through logs till it stops reconciling etc. To observe defaulting webhook run:
 
-```
-kubectl apply -f
+```bash
+kubectl apply -f https://raw.githubusercontent.com/aerfio/k8s-easy-webhooks/master/config/samples/test_v1alpha1_tester_defaulted.yaml
 ```
 
 And to observe validating webhook, which will deny applying incorrect CR run this command:
 
-```
-kubectl apply -f
+```bash
+kubectl apply -f https://raw.githubusercontent.com/aerfio/k8s-easy-webhooks/master/config/samples/test_v1alpha1_tester_incorrect.yaml
 ```
