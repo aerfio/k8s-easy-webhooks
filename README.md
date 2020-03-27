@@ -21,3 +21,7 @@ And to observe validating webhook, which will deny applying incorrect CR run thi
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/aerfio/k8s-easy-webhooks/master/config/samples/test_v1alpha1_tester_incorrect.yaml
 ```
+
+# Needed resources
+
+![](https://i.imgur.com/GMPyRCA.png?1)
